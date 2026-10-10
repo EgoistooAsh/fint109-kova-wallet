@@ -1,9 +1,9 @@
 # Kova Wallet: send-money mobile web app
 
-Final project for **FINT109 Mobile Web App Development** (FINT109-CON05, 1Q26)
+Final project for **FINT109 Mobile Web App Development** (FINT109_CON05_1Q2627)
 by **Aleck Joaquin T. Abacan**, BS Financial Technology, Mapúa University Makati.
 
-Kova Wallet is a fictional e-wallet for workers abroad, freelancers and travelers. Money added by QR, bank transfer, card or cash becomes a USDC balance that can be spent or sent home for a flat $0.50 fee. This prototype covers adding money and the full send-money journey, from sign-in to a confirmed transfer in the activity history.
+Kova Wallet is a fictional e-wallet for workers abroad, freelancers and travelers. Money added by bank app QR, bank transfer, card or cash becomes a USDC balance that can be spent or sent home for a flat $0.50 fee plus a 0.5% conversion fee. This prototype covers adding money and the full send-money journey, from sign-in to a confirmed transfer in the activity history.
 
 > Kova Wallet is not a real product. No real money moves, and all names, balances and rates are made up.
 
@@ -78,7 +78,7 @@ js/theme.js       picks light or dark mode before the page draws
 js/guard.js       sends signed-out visitors to sign in (signed-in pages only)
 js/app.js         optional enhancements (nothing leaves the browser)
 images/           logo, app mock-up, flow diagrams and demo QR code (WebP and SVG)
-fonts/            Inter and Plus Jakarta Sans, with their OFL licences
+fonts/            Inter and Plus Jakarta Sans, with their OFL licenses
 ```
 
 ## Testing
