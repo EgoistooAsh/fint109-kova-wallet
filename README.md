@@ -9,11 +9,16 @@ Kova Wallet is a fictional e-wallet for workers abroad, freelancers and traveler
 
 ## Try it
 
-Open `index.html`, choose **Try the demo**, then sign in with the demo account:
+- **Live site:** [egoistooash.github.io/fint109-kova-wallet](https://egoistooash.github.io/fint109-kova-wallet/)
+- **Source code:** [github.com/EgoistooAsh/fint109-kova-wallet](https://github.com/EgoistooAsh/fint109-kova-wallet)
+
+Open the live site, choose **Try the demo**, then sign in with the demo account:
 
 | Email | Password |
 |---|---|
 | maria@kova.example | kova2026 |
+
+To run it offline, download the repository and open `index.html` in a browser.
 
 ## Supported devices
 
