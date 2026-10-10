@@ -20,6 +20,16 @@ Open the live site, choose **Try the demo**, then sign in with the demo account.
 
 To run it offline, download the repository and open `index.html` in a browser.
 
+## Final project documents
+
+All the written work for the final project is in the [Web Dev Finals folder](https://mymailmapuaedu-my.sharepoint.com/:f:/g/personal/ajtabacan_mymail_mapua_edu_ph/IgAe2Utu85k5RrC9FZt4jCPjAVfJ0wuSO9lQ4w7DoluapJQ?e=TZiqow) on SharePoint:
+
+| File | What it contains |
+|---|---|
+| [Abacan-PlanningPack.pdf](https://mymailmapuaedu-my.sharepoint.com/:b:/g/personal/ajtabacan_mymail_mapua_edu_ph/IQALHpSGvQ8PS43UpE-B6VK-Aek3qkCvbLWeEq77j27Jl30) | Proposal, persona, sitemap, user journey, wireframes, roles and plan |
+| [Abacan-UsabilityTestReport.pdf](https://mymailmapuaedu-my.sharepoint.com/:b:/g/personal/ajtabacan_mymail_mapua_edu_ph/IQC_0y0_orifRrWor0BNVA20AfZo12F1CDe7Mgmm7qLAuFk) | Test procedure, feedback from four participants and the changes made |
+| [Abacan-ReflectionReport.pdf](https://mymailmapuaedu-my.sharepoint.com/:b:/g/personal/ajtabacan_mymail_mapua_edu_ph/IQBdILRKFvG0Srvm5Y1Fkv5dASUfYqdTD7Ah45xu6rpFGdU) | Contribution, tools used, how the project meets the brief, testing evidence and reflection |
+
 ## Supported devices
 
 Since this is a Mobile Web App Development course, Kova is built mobile-first and works on phones, tablets and computers, in portrait and landscape. It was tested on these 26 screen profiles using browser device emulation:
@@ -83,7 +93,7 @@ fonts/            Inter and Plus Jakarta Sans, with their OFL licences
 
 ## Changes after usability testing
 
-Four people tested the prototype. Their feedback and the changes are in the Usability Test Report; in short:
+Four people tested the prototype. Their feedback and the changes are in the [Usability Test Report](https://mymailmapuaedu-my.sharepoint.com/:b:/g/personal/ajtabacan_mymail_mapua_edu_ph/IQC_0y0_orifRrWor0BNVA20AfZo12F1CDe7Mgmm7qLAuFk); in short:
 
 | Feedback | Change |
 |---|---|
