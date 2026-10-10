@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Review your transfer | Kova Wallet</title>
+  <meta name="description" content="Review the details and fees of your Kova transfer, then confirm it.">
+  <meta name="author" content="Aleck Joaquin T. Abacan">
+  <meta name="theme-color" content="#0B1F33">
+  <link rel="icon" href="images/kova-logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/theme.js"></script>
+</head>
+<body data-page="confirm">
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <div class="app-shell">
+    <header class="app-header">
+      <a class="brand" href="dashboard.html">
+        <img src="images/kova-logo.svg" alt="" width="32" height="32">
+        <span>Kova<span class="visually-hidden">, go to your dashboard</span></span>
+      </a>
+      <p class="prototype-badge">Prototype</p>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false" title="Dark mode" data-js-only hidden><svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"/></svg><svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></svg><span class="visually-hidden">Dark mode</span></button>
+      <a class="sign-out" href="index.html" data-sign-out>Sign out</a>
+      <span class="avatar" aria-hidden="true">M</span>
+    </header>
+
+    <nav class="app-nav" aria-label="App">
+      <ul>
+        <li><a href="dashboard.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/></svg><span>Home</span></a></li>
+        <li><a href="top-up.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg><span>Add money</span></a></li>
+        <li><a href="send.html" aria-current="true"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3 10.5 13.5"/><path d="M21 3l-6.5 18-4-7.5L3 9.5 21 3z"/></svg><span>Send</span></a></li>
+        <li><a href="activity.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg><span>Activity</span></a></li>
+        <li><a href="help.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.2a2.5 2.5 0 0 1 4.8 1c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17.2h.01"/></svg><span>Help</span></a></li>
+      </ul>
+    </nav>
+
+    <main id="main" class="app-main">
+      <div class="page-head" id="review-head">
+        <ol class="progress" aria-label="Transfer progress">
+          <li class="done"><span>1</span>Details</li>
+          <li aria-current="step"><span>2</span>Review</li>
+          <li><span>3</span>Done</li>
+        </ol>
+        <h1>Review your transfer</h1>
+        <p>Check everything below. Nothing is sent until you confirm.</p>
+      </div>
+
+      <div class="send-layout">
+        <section class="panel" id="review-panel" aria-labelledby="summary-title">
+          <h2 id="summary-title" class="visually-hidden">Transfer summary</h2>
+          <dl class="summary-list">
+            <div><dt>To</dt><dd id="s-name">Mama Rosa Santos</dd></div>
+            <div><dt>Mobile</dt><dd id="s-mobile">+63 917 555 0142</dd></div>
+            <div id="s-email-row" hidden><dt>Email receipt</dt><dd id="s-email"></dd></div>
+            <div><dt>Delivery</dt><dd id="s-delivery">E-wallet, within 5 minutes</dd></div>
+            <div><dt>Send on</dt><dd id="s-date">Today</dd></div>
+            <div><dt>You send</dt><dd id="s-amount">200.00 USDC</dd></div>
+            <div><dt>Fees</dt><dd id="s-fees">1.50 USDC</dd></div>
+            <div><dt>Exchange rate</dt><dd id="s-rate">1 USDC = 57.00 PHP</dd></div>
+            <div class="summary-total"><dt>They receive</dt><dd id="s-receive">PHP 11,314.64</dd></div>
+          </dl>
+          <div class="review-actions">
+            <a class="btn btn-primary" href="#done" id="confirm-button">Confirm and send</a>
+            <a class="btn btn-secondary" href="send.html" id="edit-button">Edit details</a>
+          </div>
+          <p class="sample-note" id="sample-note">Showing a sample transfer. Fill in the Send money form to see your own details here.</p>
+        </section>
+
+        <aside class="panel sticky-side" aria-labelledby="before-title">
+          <h2 id="before-title">Before you confirm</h2>
+          <ul class="never-list tip-list">
+            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Make sure the mobile number is right. Money sent to the wrong number can be hard to get back.</span></li>
+            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>You can edit or cancel until you tap Confirm and send.</span></li>
+            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.2a2.5 2.5 0 0 1 4.8 1c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17.2h.01"/></svg><span>Not sure about something? <a href="help.html">Visit Help</a>.</span></li>
+          </ul>
+        </aside>
+      </div>
+
+      <section class="panel done-panel" id="done" tabindex="-1" aria-labelledby="done-title">
+        <div class="done-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></div>
+        <h2 id="done-title">Money sent</h2>
+        <p id="done-message">Mama Rosa Santos will receive PHP 11,314.64 within 5 minutes. We've texted her to let her know.</p>
+        <p class="reference" id="done-reference">KV-20261009-0042</p>
+        <p>Keep this reference number if you need to contact support.</p>
+        <div class="done-actions">
+          <a class="btn btn-primary" href="activity.html">View in Activity</a>
+          <a class="btn btn-secondary" href="dashboard.html">Back to Home</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <p><strong>Kova Wallet is a fictional prototype</strong> for FINT109 Mobile Web App Development. No real money moves.</p>
+      <p><a href="help.html#privacy">Privacy notice</a> &middot; <a href="help.html#contact">Contact support</a></p>
+    </footer>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

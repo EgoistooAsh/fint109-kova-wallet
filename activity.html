@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Activity | Kova Wallet</title>
+  <meta name="description" content="All your Kova Wallet transactions in one table, with filters by type and month.">
+  <meta name="author" content="Aleck Joaquin T. Abacan">
+  <meta name="theme-color" content="#0B1F33">
+  <link rel="icon" href="images/kova-logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/theme.js"></script>
+</head>
+<body data-page="activity">
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <div class="app-shell">
+    <header class="app-header">
+      <a class="brand" href="dashboard.html">
+        <img src="images/kova-logo.svg" alt="" width="32" height="32">
+        <span>Kova<span class="visually-hidden">, go to your dashboard</span></span>
+      </a>
+      <p class="prototype-badge">Prototype</p>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false" title="Dark mode" data-js-only hidden><svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"/></svg><svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></svg><span class="visually-hidden">Dark mode</span></button>
+      <a class="sign-out" href="index.html" data-sign-out>Sign out</a>
+      <span class="avatar" aria-hidden="true">M</span>
+    </header>
+
+    <nav class="app-nav" aria-label="App">
+      <ul>
+        <li><a href="dashboard.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/></svg><span>Home</span></a></li>
+        <li><a href="top-up.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg><span>Add money</span></a></li>
+        <li><a href="send.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3 10.5 13.5"/><path d="M21 3l-6.5 18-4-7.5L3 9.5 21 3z"/></svg><span>Send</span></a></li>
+        <li><a href="activity.html" aria-current="page"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg><span>Activity</span></a></li>
+        <li><a href="help.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.2a2.5 2.5 0 0 1 4.8 1c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17.2h.01"/></svg><span>Help</span></a></li>
+      </ul>
+    </nav>
+
+    <main id="main" class="app-main">
+      <div class="page-head">
+        <h1>Activity</h1>
+        <p>Every transfer, payment and top-up on your account.</p>
+      </div>
+
+      <section class="panel" aria-labelledby="history-title">
+        <h2 id="history-title" class="visually-hidden">Transaction history</h2>
+        <form class="filters" id="filters" data-js-only hidden>
+          <fieldset class="filter-chips">
+            <legend>Show</legend>
+            <button type="button" class="chip chip-plain" data-filter="all" aria-pressed="true">All</button>
+            <button type="button" class="chip chip-plain" data-filter="sent" aria-pressed="false">Sent</button>
+            <button type="button" class="chip chip-plain" data-filter="received" aria-pressed="false">Received</button>
+            <button type="button" class="chip chip-plain" data-filter="payment" aria-pressed="false">Payments</button>
+            <button type="button" class="chip chip-plain" data-filter="topup" aria-pressed="false">Top-ups</button>
+          </fieldset>
+          <div class="field">
+            <label for="month">Month</label>
+            <select class="select" id="month">
+              <option value="all">All months</option>
+              <option value="2026-10" selected>October 2026</option>
+              <option value="2026-09">September 2026</option>
+            </select>
+          </div>
+        </form>
+
+        <p class="visually-hidden" id="results-count" aria-live="polite"></p>
+
+        <div class="table-scroll">
+          <table class="data-table stack-table" id="activity-table">
+            <caption id="activity-caption">All transactions (fictional)</caption>
+            <thead>
+              <tr>
+                <th scope="col">Description</th>
+                <th scope="col">Date</th>
+                <th scope="col">Type</th>
+                <th scope="col" class="num">Amount (USDC)</th>
+                <th scope="col" class="num">Local amount</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody id="activity-body">
+              <tr data-type="sent" data-month="2026-10">
+                <th scope="row">Sent to Mama Rosa</th>
+                <td class="col-date"><time datetime="2026-10-08">8 Oct 2026</time></td>
+                <td class="col-type">Sent</td>
+                <td class="col-amount num">&minus;200.00</td>
+                <td class="col-local num">PHP 11,314.64</td>
+                <td class="col-status"><span class="status">Done</span></td>
+              </tr>
+              <tr data-type="payment" data-month="2026-10">
+                <th scope="row">Corner Market, Dubai</th>
+                <td class="col-date"><time datetime="2026-10-08">8 Oct 2026</time></td>
+                <td class="col-type">Payment</td>
+                <td class="col-amount num">&minus;18.50</td>
+                <td class="col-local num">AED 67.57</td>
+                <td class="col-status"><span class="status">Done</span></td>
+              </tr>
+              <tr data-type="topup" data-month="2026-10">
+                <th scope="row">Card top-up</th>
+                <td class="col-date"><time datetime="2026-10-07">7 Oct 2026</time></td>
+                <td class="col-type">Top-up</td>
+                <td class="col-amount num amount-in">+500.00</td>
+                <td class="col-local num">USDC</td>
+                <td class="col-status"><span class="status">Done</span></td>
+              </tr>
+              <tr data-type="payment" data-month="2026-10">
+                <th scope="row">Metro card reload, Dubai</th>
+                <td class="col-date"><time datetime="2026-10-07">7 Oct 2026</time></td>
+                <td class="col-type">Payment</td>
+                <td class="col-amount num">&minus;13.69</td>
+                <td class="col-local num">AED 50.00</td>
+                <td class="col-status"><span class="status">Done</span></td>
+              </tr>
+              <tr data-type="received" data-month="2026-10">
+                <th scope="row">Received from Arjun</th>
+                <td class="col-date"><time datetime="2026-10-06">6 Oct 2026</time></td>
+                <td class="col-type">Received</td>
+                <td class="col-amount num amount-in">+75.00</td>
+                <td class="col-local num">USDC</td>
+                <td class="col-status"><span class="status">Done</span></td>
+              </tr>
+              <tr data-type="sent" data-month="2026-10">
+                <th scope="row">Sent to Mama Rosa</th>
+                <td class="col-date"><time datetime="2026-10-02">2 Oct 2026</time></td>
+                <td class="col-type">Sent</td>
+                <td class="col-amount num">&minus;200.00</td>
+                <td class="col-local num">PHP 11,314.64</td>
+                <td class="col-status"><span class="status">Done</span></td>
+              </tr>
+              <tr data-type="topup" data-month="2026-09">
+                <th scope="row">Salary top-up</th>
+                <td class="col-date"><time datetime="2026-09-30">30 Sep 2026</time></td>
+                <td class="col-type">Top-up</td>
+                <td class="col-amount num amount-in">+1,000.00</td>
+                <td class="col-local num">USDC</td>
+                <td class="col-status"><span class="status">Done</span></td>
+              </tr>
+              <tr data-type="sent" data-month="2026-09">
+                <th scope="row">Sent to Mama Rosa</th>
+                <td class="col-date"><time datetime="2026-09-24">24 Sep 2026</time></td>
+                <td class="col-type">Sent</td>
+                <td class="col-amount num">&minus;200.00</td>
+                <td class="col-local num">PHP 11,314.64</td>
+                <td class="col-status"><span class="status">Done</span></td>
+              </tr>
+              <tr data-type="payment" data-month="2026-09">
+                <th scope="row">Night market, Bangkok</th>
+                <td class="col-date"><time datetime="2026-09-18">18 Sep 2026</time></td>
+                <td class="col-type">Payment</td>
+                <td class="col-amount num">&minus;11.79</td>
+                <td class="col-local num">THB 420.00</td>
+                <td class="col-status"><span class="status">Done</span></td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <th scope="row" colspan="3">Net change</th>
+                <td class="num" id="net-total">+931.02</td>
+                <td colspan="2"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <p class="empty-state" id="empty-state" hidden>No transactions match these filters.</p>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <p><strong>Kova Wallet is a fictional prototype</strong> for FINT109 Mobile Web App Development. No real money moves.</p>
+      <p><a href="help.html#privacy">Privacy notice</a> &middot; <a href="help.html#contact">Contact support</a></p>
+    </footer>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

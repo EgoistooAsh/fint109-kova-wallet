@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Kova Wallet | Send money home in minutes for a flat $0.50</title>
+  <meta name="description" content="Kova Wallet is a fictional mobile web app that helps workers abroad, freelancers and travelers add money and send it home in minutes for a flat $0.50, with every fee shown before they send.">
+  <meta name="author" content="Aleck Joaquin T. Abacan">
+  <meta name="theme-color" content="#0B1F33">
+  <link rel="icon" href="images/kova-logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/theme.js"></script>
+</head>
+<body data-page="landing">
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html">
+        <img src="images/kova-logo.svg" alt="" width="32" height="32">
+        <span>Kova<span class="visually-hidden"> Wallet home</span></span>
+      </a>
+      <nav class="site-nav" aria-label="Main">
+        <ul>
+          <li><a class="nav-wide" href="index.html#how">How it works</a></li>
+          <li><a href="help.html">Help</a></li>
+          <li><button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false" title="Dark mode" data-js-only hidden><svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"/></svg><svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></svg><span class="visually-hidden">Dark mode</span></button></li>
+          <li><a class="nav-cta" href="sign-in.html">Sign in</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="container hero-inner">
+        <div>
+          <p class="eyebrow">For workers abroad, freelancers and travelers</p>
+          <h1 id="hero-title">Send money home in minutes, for a flat $0.50.</h1>
+          <p class="hero-lead">Kova holds your money as digital dollars and sends it to your family's e-wallet or bank in their own currency. You see every fee and the exact amount they get before you tap send.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="sign-in.html">Try the demo</a>
+            <a class="btn btn-ghost-dark" href="#how">See how it works</a>
+          </div>
+          <ul class="trust-list">
+            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Fees shown before you send</li>
+            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Arrives in minutes</li>
+            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Only the data a transfer needs</li>
+          </ul>
+        </div>
+        <div class="hero-media">
+          <img src="images/kova-app.webp" alt="Kova app on a phone showing a balance of 1,250.00 USDC, buttons to send and cash out, and a transfer to Mama Rosa that arrived in 38 seconds for a $0.50 fee" width="480" height="600">
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-white" id="how" aria-labelledby="how-title">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">How it works</p>
+          <h2 id="how-title">Four steps from your paycheck to your family</h2>
+          <p>Kova keeps your money as USDC, a stablecoin worth 1 US dollar, so it holds its value until you send it.</p>
+        </div>
+        <ol class="steps-list">
+          <li><h3>Top up</h3><p>Add money by bank app QR, bank transfer, card or cash.</p></li>
+          <li><h3>Hold digital dollars</h3><p>Your balance is shown in USDC and in your home currency.</p></li>
+          <li><h3>Send</h3><p>Pick a recipient, check the fees and confirm.</p></li>
+          <li><h3>They cash out</h3><p>Your family gets their local currency in an e-wallet or bank.</p></li>
+        </ol>
+        <figure class="flow-figure">
+          <picture>
+            <source media="(max-width: 639px)" srcset="images/kova-flow-mobile.webp" width="700" height="990">
+            <img src="images/kova-flow.webp" alt="Diagram: a card or bank top-up becomes one USDC balance, which can be spent, sent to any Kova wallet or cashed out to a bank or e-wallet" width="1100" height="440" loading="lazy">
+          </picture>
+          <figcaption>One balance for spending, sending and cashing out.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section" id="fees" aria-labelledby="fees-title">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">Fees</p>
+          <h2 id="fees-title">More of your $500 reaches home</h2>
+          <p>Illustrative, fictional figures comparing a typical remittance counter with Kova.</p>
+        </div>
+        <div class="panel table-scroll">
+          <table class="data-table compare">
+            <caption>Sending $500 to the Philippines: fees, speed and what arrives</caption>
+            <thead>
+              <tr><th scope="col">Cost</th><th scope="col" class="num">Remittance counter</th><th scope="col" class="num kova">Kova</th></tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Transfer fee</th><td class="num">$12.00</td><td class="num kova">$0.50</td></tr>
+              <tr><th scope="row">Exchange-rate markup</th><td class="num">3.0%</td><td class="num kova">0.5%</td></tr>
+              <tr><th scope="row">Arrives in</th><td class="num">1 to 2 days</td><td class="num kova">Minutes</td></tr>
+            </tbody>
+            <tfoot>
+              <tr class="row-total"><th scope="row">Your family gets about</th><td class="num">$473</td><td class="num kova">$497</td></tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-white" aria-labelledby="why-title">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">Why Kova</p>
+          <h2 id="why-title">Built for sending home every payday</h2>
+        </div>
+        <div class="feature-grid">
+          <article class="feature">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+            <h3>The exact amount they get, up front</h3>
+            <p>See every fee and what your family receives before you confirm. No surprises in the exchange rate.</p>
+          </article>
+          <article class="feature">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M11 18h2"/></svg>
+            <h3>Straight to their e-wallet</h3>
+            <p>Your family cashes out to their e-wallet or bank in minutes, without queueing at a counter.</p>
+          </article>
+          <article class="feature">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4.5 6v5.5c0 4.5 3.2 8.2 7.5 9.5 4.3-1.3 7.5-5 7.5-9.5V6L12 3z"/><path d="m9 12 2 2 4-4"/></svg>
+            <h3>Only the data a transfer needs</h3>
+            <p>A name, a mobile number and an amount. Kova never asks for your home address or ID numbers.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="cta-title">
+      <div class="container">
+        <div class="cta-band">
+          <div>
+            <h2 id="cta-title">Try sending money home</h2>
+            <p>The demo account has a balance ready, so you can try a transfer in under a minute.</p>
+          </div>
+          <a class="btn btn-dark" href="sign-in.html">Try the demo</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="sign-in.html">Sign in</a></li>
+        <li><a href="help.html">Help</a></li>
+        <li><a href="help.html#privacy">Privacy notice</a></li>
+      </ul>
+      <p><strong>Kova Wallet is a fictional prototype</strong> made by Aleck Joaquin T. Abacan for FINT109 Mobile Web App Development (FINT109-CON05, 1Q26). No real money moves, and all names, balances and rates are made up.</p>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
