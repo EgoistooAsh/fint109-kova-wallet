@@ -42,6 +42,8 @@
     card: { title: 'Card top-up', label: 'Card', phrase: 'card', feeLabel: 'Card fee (1.5%)', limit: 2000, arrives: 'Instantly' },
     cash: { title: 'Cash top-up', label: 'Partner store', phrase: 'cash', feeLabel: 'Cash fee', limit: 1000, arrives: 'As soon as you pay' }
   };
+  // How a top-up is named mid-sentence: "your QR top-up", "your bank top-up"
+  const topupName = (m) => (m === 'qr' ? 'QR top-up' : TOPUP_METHODS[m].title.toLowerCase());
   const TOPUP_MIN = 10;            // USDC
   const SOURCE_OF_FUNDS_FROM = 1000; // USDC; larger top-ups need a source of funds
   const QUICK_AMOUNTS = {
@@ -62,7 +64,26 @@
     qr: svg('<rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><path d="M14 14h2v2M20 14v6h-6"/>'),
     bank: svg('<path d="M3 10 12 4l9 6"/><path d="M5.5 10v7.5M10 10v7.5M14 10v7.5M18.5 10v7.5M3 20h18"/>'),
     card: svg('<rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3 10h18M7 14.5h3"/>'),
-    cash: svg('<path d="M4 9.5 5.5 4h13L20 9.5"/><path d="M4 9.5h16a2.7 2.7 0 0 1-5.3 0 2.7 2.7 0 0 1-5.4 0A2.7 2.7 0 0 1 4 9.5z"/><path d="M5.5 12v8h13v-8M10 20v-4.5h4V20"/>')
+    cash: svg('<path d="M4 9.5 5.5 4h13L20 9.5"/><path d="M4 9.5h16a2.7 2.7 0 0 1-5.3 0 2.7 2.7 0 0 1-5.4 0A2.7 2.7 0 0 1 4 9.5z"/><path d="M5.5 12v8h13v-8M10 20v-4.5h4V20"/>'),
+    x: svg('<path d="M6 6l12 12M18 6 6 18"/>')
+  };
+
+  const SOURCE_LABELS = { salary: 'Salary or wages', savings: 'Savings', business: 'Business or freelance income', family: 'Money from family', other: 'Something else' };
+
+  // Receipts for the sample rows already in the Activity table (fictional).
+  // Amounts are worked out from these with the same fee rules as a real transfer or top-up.
+  const ROSA = { name: 'Mama Rosa Santos', mobile: '+63 917 555 0142', delivery: 'ewallet', amount: 200, currency: 'PHP' };
+  const SAMPLES = {
+    'KV-20261023-3307': Object.assign({ kind: 'sent', date: '2026-10-23', status: 'Scheduled' }, ROSA),
+    'KV-20261008-5530': Object.assign({ kind: 'sent', date: '2026-10-08', status: 'Done' }, ROSA),
+    'KVP-20261008-2214': { kind: 'payment', title: 'Corner Market, Dubai', how: 'QR payment', currency: 'AED', local: 67.57, date: '2026-10-08', status: 'Done' },
+    'KVT-261007-318': { kind: 'topup', title: 'Card top-up', method: 'card', card: 'visa-4821', currency: 'USD', pay: 507.61, date: '2026-10-07', status: 'Done' },
+    'KVP-20261007-0961': { kind: 'payment', title: 'Metro card reload, Dubai', how: 'Kova card, online', currency: 'AED', local: 50, date: '2026-10-07', status: 'Done' },
+    'KVR-20261006-7745': { kind: 'received', title: 'Received from Arjun', from: 'Arjun Mehta', amount: 75, date: '2026-10-06', status: 'Done' },
+    'KV-20261002-1408': Object.assign({ kind: 'sent', date: '2026-10-02', status: 'Done' }, ROSA),
+    'KVT-260930-552': { kind: 'topup', title: 'Salary top-up', method: 'bank', currency: 'USD', pay: 1000, source: 'salary', date: '2026-09-30', status: 'Done' },
+    'KV-20260924-8862': Object.assign({ kind: 'sent', date: '2026-09-24', status: 'Done' }, ROSA),
+    'KVP-20260918-4410': { kind: 'payment', title: 'Night market, Bangkok', how: 'QR payment', currency: 'THB', local: 420, date: '2026-09-18', status: 'Done' }
   };
 
   // ---------- Small helpers ----------
@@ -96,7 +117,7 @@
 
   const money = (n) => n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const whole = (n) => n.toLocaleString('en-US', { maximumFractionDigits: 0 });
-  const round2 = (n) => Math.round(n * 100) / 100;
+  const round2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
   const pad = (n) => String(n).padStart(2, '0');
   const isoDate = (d) => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
   const parseIso = (s) => { const p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); };
@@ -126,38 +147,76 @@
     return '1 USDC = ' + money(RATES[currency]) + ' ' + currency;
   }
 
-  // Works out the fees and what the recipient gets
+  // Works out the fees and what the recipient gets.
+  // Each fee is rounded to the cent first and the total comes from those rounded fees,
+  // so the fee lines on screen always add up to what they receive.
   function quote(amount, currency) {
-    const afterFee = Math.max(amount - SEND_FEE, 0);
-    const conversion = afterFee * CONVERSION;
+    const afterFee = Math.max(round2(amount - SEND_FEE), 0);
+    const conversion = round2(afterFee * CONVERSION);
     return {
       conversion: conversion,
-      fees: SEND_FEE + conversion,
+      fees: round2(SEND_FEE + conversion),
       rate: RATES[currency],
-      receive: (afterFee - conversion) * RATES[currency]
+      receive: round2((afterFee - conversion) * RATES[currency])
     };
   }
 
-  // Works out what a top-up adds to the balance
+  // Works out what a top-up adds to the balance, with the same rounding rule
   function topupQuote(pay, currency, method) {
-    const value = pay / RATES[currency];
-    const conversion = currency === 'USD' ? 0 : value * CONVERSION;
-    const methodFee = method === 'card' ? value * 0.015 : method === 'cash' ? 1 : 0;
+    const value = round2(pay / RATES[currency]);
+    const conversion = currency === 'USD' ? 0 : round2(value * CONVERSION);
+    const methodFee = method === 'card' ? round2(value * 0.015) : method === 'cash' ? 1 : 0;
     return {
       value: value,
       conversion: conversion,
       methodFee: methodFee,
-      get: Math.max(value - conversion - methodFee, 0)
+      get: Math.max(round2(value - conversion - methodFee), 0)
     };
+  }
+
+  // A card or QR payment in another currency: the local price plus a 0.5% conversion fee
+  function paymentQuote(local, currency) {
+    const base = round2(local / RATES[currency]);
+    const conversion = round2(base * CONVERSION);
+    return { base: base, conversion: conversion, total: round2(base + conversion) };
   }
 
   const sentTransfers = () => store.get('sent', []);
   const topups = () => store.get('topups', []);
+  const cancelledSamples = () => store.get('cancelled', []);
+  const isCancelled = (t) => t.status === 'Cancelled';
 
   function currentBalance() {
-    const spent = sentTransfers().reduce((sum, t) => sum + t.amount, 0);
+    const spent = sentTransfers().filter((t) => !isCancelled(t)).reduce((sum, t) => sum + t.amount, 0);
     const added = topups().filter((t) => t.status === 'Done').reduce((sum, t) => sum + t.get, 0);
-    return round2(START_BALANCE - spent + added);
+    // The sample scheduled transfer is already taken out of the starting balance; cancelling it gives it back
+    const refunded = cancelledSamples().reduce((sum, ref) => sum + (SAMPLES[ref] && SAMPLES[ref].kind === 'sent' ? SAMPLES[ref].amount : 0), 0);
+    return round2(START_BALANCE - spent + added + refunded);
+  }
+
+  // Change the status of a transfer or top-up made in this session
+  function setStatus(listKey, reference, status) {
+    const list = store.get(listKey, []).map((t) => (t.reference === reference ? Object.assign(t, { status: status }) : t));
+    store.set(listKey, list);
+  }
+
+  // Copy buttons: data-copy names the element whose text is copied
+  function wireCopyButton(button) {
+    button.addEventListener('click', () => {
+      const text = document.getElementById(button.dataset.copy).textContent.trim();
+      const label = button.querySelector('span');
+      const confirmCopied = () => {
+        label.textContent = 'Copied';
+        button.classList.add('is-copied');
+        announce('Copied ' + text);
+        setTimeout(() => { label.textContent = 'Copy'; button.classList.remove('is-copied'); }, 2000);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(confirmCopied, () => announce('Copy failed. Select the text instead.'));
+      } else {
+        announce('Copy is not available here. Select the text instead.');
+      }
+    });
   }
 
   // Everything done in this session, oldest first
@@ -306,8 +365,13 @@
     initTheme();
 
     $$('[data-sign-out]').forEach((link) => {
-      link.addEventListener('click', () => store.clearAll());
+      link.addEventListener('click', () => {
+        store.clearAll();
+        try { localStorage.removeItem('kova.remember'); } catch (error) { /* ignore */ }
+      });
     });
+
+    $$('.copy-button').forEach(wireCopyButton);
   }
 
   // ---------- Sign in ----------
@@ -345,6 +409,12 @@
 
     const validator = createValidator(form, [loginCheck, passwordCheck]);
 
+    // Sent here from a signed-in page: say why, and go back there afterwards.
+    // Only Kova's own pages are allowed, so the link can't send anyone elsewhere.
+    const next = new URLSearchParams(window.location.search).get('next') || '';
+    const safeNext = /^(dashboard|top-up|send|confirm|activity)\.html(\?[\w=&%.-]*)?$/.test(next) ? next : '';
+    if (safeNext) $('#sign-in-needed').hidden = false;
+
     $('#fill-demo').addEventListener('click', () => {
       login.value = DEMO.login;
       password.value = DEMO.password;
@@ -368,7 +438,12 @@
         return;
       }
       store.set('signedIn', true);
-      window.location.href = 'dashboard.html';
+      // "Keep me signed in" survives closing the browser; Sign out clears it
+      try {
+        if ($('#remember').checked) localStorage.setItem('kova.remember', 'true');
+        else localStorage.removeItem('kova.remember');
+      } catch (error) { /* storage blocked: stay signed in for this visit only */ }
+      window.location.href = safeNext || 'dashboard.html';
     });
   }
 
@@ -405,16 +480,24 @@
     // New items go to the top of Recent activity and Coming up
     const today = todayIso();
     const recent = $('#recent-list');
-    const comingUp = $('.scheduled') ? $('.scheduled').parentNode : null;
+    const upcomingEmpty = $('#upcoming-empty');
+    const comingUp = upcomingEmpty ? upcomingEmpty.parentNode : null;
 
-    function addComingUp(iconHtml, title, detail) {
+    // The sample scheduled transfer disappears once it's cancelled
+    $$('.scheduled[data-ref]').forEach((item) => {
+      if (cancelledSamples().indexOf(item.dataset.ref) !== -1) item.remove();
+    });
+
+    // Each item is a link: a scheduled transfer opens its receipt, a top-up its payment details
+    function addComingUp(iconHtml, title, detail, href) {
       if (!comingUp) return;
-      const item = document.createElement('div');
+      const item = document.createElement('a');
       item.className = 'scheduled';
+      item.href = href;
       item.innerHTML = iconHtml + '<p><b></b><br></p>';
       $('b', item).textContent = title;
       $('p', item).appendChild(document.createTextNode(detail));
-      comingUp.insertBefore(item, $('.scheduled', comingUp));
+      comingUp.insertBefore(item, $('.scheduled', comingUp) || upcomingEmpty);
     }
 
     // Oldest first, each placed on top, so the newest ends up first
@@ -422,34 +505,40 @@
       const li = document.createElement('li');
       li.className = 'tx';
       li.innerHTML = '<span class="tx-icon"></span><span class="tx-what"><b></b><small></small></span><span class="tx-amount"><span></span><small></small></span>';
+      const cancelled = isCancelled(t);
 
       if (t.kind === 'sent') {
         const scheduled = t.date > today;
         $('.tx-icon', li).innerHTML = ICONS.send;
         $('b', li).textContent = 'Sent to ' + firstName(t.name);
-        $('.tx-what small', li).textContent = (scheduled ? 'Scheduled for ' : '') + shortDate(t.date) + ' · ' + DELIVERY[t.delivery].label;
+        $('.tx-what small', li).textContent = (cancelled ? 'Cancelled · ' : scheduled ? 'Scheduled for ' : '') + shortDate(t.date) + ' · ' + DELIVERY[t.delivery].label;
         $('.tx-amount span', li).textContent = '−' + money(t.amount);
-        $('.tx-amount small', li).textContent = t.currency + ' ' + money(t.receive);
-        if (scheduled) {
+        $('.tx-amount small', li).textContent = cancelled ? 'Cancelled' : t.currency + ' ' + money(t.receive);
+        if (scheduled && !cancelled) {
           addComingUp(ICONS.calendar, firstName(t.name) + ', ' + money(t.amount) + ' USDC',
-            'Scheduled for ' + shortDate(t.date) + ', to their ' + DELIVERY[t.delivery].label.toLowerCase());
+            'Scheduled for ' + shortDate(t.date) + ', to their ' + DELIVERY[t.delivery].label.toLowerCase(),
+            'activity.html?ref=' + encodeURIComponent(t.reference));
         }
       } else {
-        const pending = t.status !== 'Done';
+        const pending = t.status === 'Pending';
         $('.tx-icon', li).innerHTML = ICONS[t.method];
         $('b', li).textContent = TOPUP_METHODS[t.method].title;
-        $('.tx-what small', li).textContent = shortDate(t.date) + ' · ' + (pending ? 'Waiting for payment' : TOPUP_METHODS[t.method].label);
+        $('.tx-what small', li).textContent = shortDate(t.date) + ' · ' + (cancelled ? 'Cancelled' : pending ? 'Waiting for payment' : TOPUP_METHODS[t.method].label);
         $('.tx-amount span', li).textContent = '+' + money(t.get);
-        $('.tx-amount small', li).textContent = pending ? 'Pending' : 'USDC';
-        if (!pending) $('.tx-amount', li).classList.add('amount-in');
+        $('.tx-amount small', li).textContent = cancelled ? 'Cancelled' : pending ? 'Pending' : 'USDC';
+        if (t.status === 'Done') $('.tx-amount', li).classList.add('amount-in');
         if (pending) {
           addComingUp(ICONS.clock, TOPUP_METHODS[t.method].title + ', ' + money(t.get) + ' USDC',
-            'Waiting for your ' + t.currency + ' ' + money(t.pay) + ' payment');
+            'Waiting for your ' + t.currency + ' ' + money(t.pay) + ' payment',
+            'top-up.html?ref=' + encodeURIComponent(t.reference));
         }
       }
+      if (cancelled) li.classList.add('is-cancelled');
       $('b', li).insertAdjacentHTML('beforeend', '<span class="badge-new">New</span>');
       recent.insertBefore(li, recent.firstChild);
     });
+
+    if (upcomingEmpty) upcomingEmpty.hidden = !!$('.scheduled', comingUp);
 
     // Keep the list short on the dashboard
     $$('.tx', recent).slice(4).forEach((li) => li.remove());
@@ -819,20 +908,36 @@
     });
 
     // ----- Result panel -----
-    function setPanel(iconName, pending, title, message) {
+    function setPanel(iconName, state, title, message) {
       const icon = $('#topup-done-icon');
       icon.innerHTML = ICONS[iconName];
-      icon.classList.toggle('is-pending', pending);
+      icon.classList.toggle('is-pending', state === 'pending');
+      icon.classList.toggle('is-cancelled', state === 'cancelled');
       $('#topup-done-title').textContent = title;
       $('#topup-done-message').textContent = message;
       document.title = title + ' | Kova Wallet';
     }
 
-    function showPaid(t) {
-      setPanel('check', false, 'Money added',
-        money(t.get) + ' USDC is now in your balance' + (t.method === 'card' ? '. We charged ' + t.currency + ' ' + money(t.pay) + ' to your ' + CARDS[t.card] + '.' : '.'));
+    // Once a top-up is paid or cancelled, the payment steps and buttons go away
+    function closePayment() {
       $$('.pay-box', done).forEach((box) => { box.hidden = true; });
       $('#simulate-paid').hidden = true;
+      $('#cancel-topup').hidden = true;
+      $('#cancel-topup-confirm').hidden = true;
+      $('#topup-reference-block').hidden = false;
+    }
+
+    function showPaid(t) {
+      setPanel('check', 'done', 'Money added',
+        money(t.get) + ' USDC is now in your balance' + (t.method === 'card' ? '. We charged ' + t.currency + ' ' + money(t.pay) + ' to your ' + CARDS[t.card] + '.' : '.'));
+      closePayment();
+    }
+
+    function showCancelled(t) {
+      setPanel('x', 'cancelled', 'Top-up cancelled',
+        'This ' + topupName(t.method) + ' of ' + t.currency + ' ' + money(t.pay) + ' is cancelled. Don\'t pay it. Nothing was added to your balance.');
+      closePayment();
+      announce('Top-up cancelled.');
     }
 
     function showResult(t) {
@@ -842,23 +947,27 @@
       $('#topup-reference').textContent = t.reference;
       $('#topup-reference-block').hidden = t.method === 'bank'; // bank details already show it
       $('#topup-sample-note').hidden = true;
-      $('#simulate-paid').hidden = t.status === 'Done';
+      $('#pending-topup').hidden = true;
+      $('#simulate-paid').hidden = t.status !== 'Pending';
+      $('#cancel-topup').hidden = t.status !== 'Pending';
 
-      if (t.status === 'Done') {
+      if (t.status === 'Cancelled') {
+        showCancelled(t);
+      } else if (t.status === 'Done') {
         showPaid(t);
       } else if (t.method === 'qr') {
         $('#qr-amount').textContent = payText;
-        setPanel('qr', true, 'Scan to pay from your bank app',
+        setPanel('qr', 'pending', 'Scan to pay from your bank app',
           'Pay ' + payText + ' in your bank app. ' + money(t.get) + ' USDC lands in your balance as soon as you approve it.');
       } else if (t.method === 'bank') {
         $('#bank-amount').textContent = payText;
         $('#bank-reference').textContent = t.reference;
-        setPanel('bank', true, 'Send the bank transfer to finish',
+        setPanel('bank', 'pending', 'Send the bank transfer to finish',
           'Send exactly ' + payText + ' from a bank account in your name. We\'ll add ' + money(t.get) + ' USDC within 1 business day of receiving it.');
       } else {
         $('#cash-amount').textContent = payText;
         $('#cash-code').textContent = t.cashCode;
-        setPanel('cash', true, 'Pay in cash to finish',
+        setPanel('cash', 'pending', 'Pay in cash to finish',
           'Pay ' + payText + ' at a partner store. ' + money(t.get) + ' USDC lands in your balance as soon as you pay.');
       }
 
@@ -902,31 +1011,46 @@
     // Prototype shortcut: mark a pending top-up as paid so testers can see the balance change
     $('#simulate-paid').addEventListener('click', () => {
       if (!current) return;
-      const list = topups().map((t) => (t.reference === current.reference ? Object.assign(t, { status: 'Done' }) : t));
-      store.set('topups', list);
+      setStatus('topups', current.reference, 'Done');
       current.status = 'Done';
       showPaid(current);
       done.focus();
     });
 
-    // Copy buttons for the bank details
-    $$('.copy-button').forEach((button) => {
-      button.addEventListener('click', () => {
-        const text = document.getElementById(button.dataset.copy).textContent.trim();
-        const label = button.querySelector('span');
-        const confirmCopied = () => {
-          label.textContent = 'Copied';
-          button.classList.add('is-copied');
-          announce('Copied ' + text);
-          setTimeout(() => { label.textContent = 'Copy'; button.classList.remove('is-copied'); }, 2000);
-        };
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(text).then(confirmCopied, () => announce('Copy failed. Select the text instead.'));
-        } else {
-          announce('Copy is not available here. Select the text instead.');
-        }
-      });
+    // Cancel a top-up that's still waiting for payment (asks once before cancelling)
+    const cancelButton = $('#cancel-topup');
+    const cancelBox = $('#cancel-topup-confirm');
+    function askCancel(open) {
+      cancelBox.hidden = !open;
+      cancelButton.setAttribute('aria-expanded', String(open));
+      if (open) $('#cancel-topup-yes').focus();
+    }
+    cancelButton.addEventListener('click', () => askCancel(cancelBox.hidden));
+    $('#cancel-topup-no').addEventListener('click', () => { askCancel(false); cancelButton.focus(); });
+    $('#cancel-topup-yes').addEventListener('click', () => {
+      if (!current) return;
+      setStatus('topups', current.reference, 'Cancelled');
+      current.status = 'Cancelled';
+      askCancel(false);
+      showCancelled(current);
+      done.focus();
     });
+
+    // Reopen a top-up from Home or Activity: top-up.html?ref=KVT-...
+    const params = new URLSearchParams(window.location.search);
+    const reopened = topups().find((t) => t.reference === params.get('ref'));
+    if (reopened) {
+      showResult(reopened);
+    } else {
+      // Otherwise, point out a top-up that is still waiting for payment
+      const waiting = topups().filter((t) => t.status === 'Pending').pop();
+      if (waiting) {
+        $('#pending-topup-text').textContent = 'Your ' + topupName(waiting.method) + ' of ' +
+          waiting.currency + ' ' + money(waiting.pay) + ' is still waiting for payment.';
+        $('#pending-topup-link').href = 'top-up.html?ref=' + encodeURIComponent(waiting.reference);
+        $('#pending-topup').hidden = false;
+      }
+    }
   }
 
   // ---------- Review and confirm ----------
@@ -934,6 +1058,17 @@
     const t = store.get('transfer', null);
     const today = todayIso();
     const scheduled = t && t.date > today;
+
+    // Nothing waiting to be reviewed (already sent, or opened with Back or a bookmark):
+    // show that instead of a sample with a live Confirm button.
+    // Without JavaScript the sample stays, so the page can still be shown in a demo.
+    if (!t) {
+      $('.send-layout').hidden = true;
+      $('#review-head p').hidden = true;
+      $('#no-transfer').hidden = false;
+      document.title = 'No transfer to review | Kova Wallet';
+      return;
+    }
 
     if (t) {
       $('#s-name').textContent = t.name;
@@ -970,6 +1105,7 @@
           : t.name + ' will receive ' + t.currency + ' ' + money(t.receive) + ' ' + DELIVERY[t.delivery].time + '.' + (t.email ? ' We\'ve emailed them a receipt.' : '');
       }
       $('#done-reference').textContent = reference;
+      $('#done-activity').href = 'activity.html?ref=' + encodeURIComponent(reference);
 
       // Move the progress steps on and swap the review for the success panel
       const steps = $$('.progress li');
@@ -990,18 +1126,109 @@
   }
 
   // ---------- Activity ----------
+  // A receipt for any row: a transfer, top-up, payment or money received
+  function receiptFor(record) {
+    const lines = [];
+    const add = (label, value, total) => lines.push({ label: label, value: value, total: !!total });
+    const scheduled = record.status === 'Scheduled';
+    let kicker = 'Receipt';
+    let title = record.title || '';
+    let amountText = '';
+    let action = null;
+
+    if (record.kind === 'sent') {
+      // Transfers made in this session keep their own figures; samples are worked out the same way
+      const q = quote(record.amount, record.currency);
+      const conversion = record.fees !== undefined ? round2(record.fees - SEND_FEE) : q.conversion;
+      const receive = record.receive !== undefined ? record.receive : q.receive;
+      kicker = 'Transfer receipt';
+      title = 'Sent to ' + firstName(record.name);
+      amountText = '−' + money(record.amount) + ' USDC';
+      add('To', record.name);
+      add('Mobile', record.mobile);
+      if (record.email) add('Email receipt', record.email);
+      add('Delivery', DELIVERY[record.delivery].label + ', ' + DELIVERY[record.delivery].time);
+      add(scheduled ? 'Send date' : 'Sent on', longDate(record.date));
+      add('You send', money(record.amount) + ' USDC');
+      add('Transfer fee', money(SEND_FEE) + ' USDC');
+      add('Conversion fee (0.5%)', money(conversion) + ' USDC');
+      add('Exchange rate', rateText(record.currency));
+      add(scheduled ? 'They\'ll receive about' : 'They received', record.currency + ' ' + money(receive), true);
+      if (scheduled) action = 'cancel-transfer';
+    } else if (record.kind === 'topup') {
+      const info = TOPUP_METHODS[record.method];
+      const q = topupQuote(record.pay, record.currency, record.method);
+      const get = record.get !== undefined ? record.get : q.get;
+      kicker = 'Top-up receipt';
+      title = title || info.title;
+      amountText = '+' + money(get) + ' USDC';
+      add('Method', info.label + (record.card ? ', ' + CARDS[record.card] : ''));
+      add(record.status === 'Done' ? 'Added on' : 'Started on', longDate(record.date));
+      add('You pay', record.currency + ' ' + money(record.pay));
+      if (record.currency !== 'USD') add('Exchange rate', rateText(record.currency));
+      add('Conversion fee (0.5%)', record.currency === 'USD' ? 'None' : money(q.conversion) + ' USDC');
+      add(info.feeLabel, q.methodFee ? money(q.methodFee) + ' USDC' : 'Free');
+      if (record.source) add('Where the money is from', SOURCE_LABELS[record.source] || record.source);
+      add(record.status === 'Done' ? 'You got' : 'You get', money(get) + ' USDC', true);
+      if (record.status === 'Pending') action = 'pending-topup';
+    } else if (record.kind === 'payment') {
+      const q = paymentQuote(record.local, record.currency);
+      kicker = 'Payment receipt';
+      amountText = '−' + money(q.total) + ' USDC';
+      add('Paid at', record.title);
+      add('Paid with', record.how);
+      add('Paid on', longDate(record.date));
+      add('Price', record.currency + ' ' + money(record.local));
+      add('Exchange rate', rateText(record.currency));
+      add('Conversion fee (0.5%)', money(q.conversion) + ' USDC');
+      add('Total', money(q.total) + ' USDC', true);
+    } else {
+      kicker = 'Money received';
+      amountText = '+' + money(record.amount) + ' USDC';
+      add('From', record.from);
+      add('Received on', longDate(record.date));
+      add('Into', 'Your Kova wallet');
+      add('Fee', 'None');
+      add('You received', money(record.amount) + ' USDC', true);
+    }
+    return { kicker: kicker, title: title, amountText: amountText, lines: lines, action: action };
+  }
+
   function initActivity() {
     const body = $('#activity-body');
     const month = $('#month');
     const chips = $$('#filters .chip');
+    const dialog = $('#receipt');
     const today = todayIso();
     const items = sessionActivity();
+    const records = {}; // reference -> details for the receipt
     let type = 'all';
+
+    function setRowStatus(row, status) {
+      const badge = $('.status', row);
+      badge.textContent = status;
+      badge.classList.toggle('pending', status === 'Scheduled' || status === 'Pending');
+      badge.classList.toggle('cancelled', status === 'Cancelled');
+      row.classList.toggle('is-cancelled', status === 'Cancelled');
+      if (status === 'Cancelled') row.dataset.cancelled = 'true'; else delete row.dataset.cancelled;
+    }
+
+    // Sample rows already in the page
+    $$('tr[data-ref]', body).forEach((row) => {
+      const sample = SAMPLES[row.dataset.ref];
+      if (!sample) return;
+      records[row.dataset.ref] = Object.assign({ reference: row.dataset.ref, sample: true }, sample);
+      if (cancelledSamples().indexOf(row.dataset.ref) !== -1) {
+        records[row.dataset.ref].status = 'Cancelled';
+        setRowStatus(row, 'Cancelled');
+      }
+    });
 
     // Add this session's transfers and top-ups to the top of the table
     items.forEach((t) => {
       const row = document.createElement('tr');
       row.dataset.month = t.date.slice(0, 7);
+      row.dataset.ref = t.reference;
       row.innerHTML =
         '<th scope="row"></th>' +
         '<td class="col-date"><time datetime="' + t.date + '">' + longDate(t.date) + '</time></td>' +
@@ -1009,29 +1236,27 @@
         '<td class="col-amount num"></td>' +
         '<td class="col-local num"></td>' +
         '<td class="col-status"><span class="status"></span></td>';
-      const status = $('.status', row);
+      let status;
 
       if (t.kind === 'sent') {
-        const scheduled = t.status === 'Scheduled' || t.date > today;
+        status = isCancelled(t) ? 'Cancelled' : (t.status === 'Scheduled' || t.date > today) ? 'Scheduled' : 'Done';
         row.dataset.type = 'sent';
         $('th', row).textContent = 'Sent to ' + firstName(t.name);
         $('.col-type', row).textContent = 'Sent';
         $('.col-amount', row).textContent = '−' + money(t.amount);
         $('.col-local', row).textContent = t.currency + ' ' + money(t.receive);
-        status.textContent = scheduled ? 'Scheduled' : 'Done';
-        status.classList.toggle('pending', scheduled);
       } else {
-        const pending = t.status !== 'Done';
+        status = t.status;
         row.dataset.type = 'topup';
-        if (pending) row.dataset.pending = 'true';
+        if (status === 'Pending') row.dataset.pending = 'true';
         $('th', row).textContent = TOPUP_METHODS[t.method].title;
         $('.col-type', row).textContent = 'Top-up';
         $('.col-amount', row).textContent = '+' + money(t.get);
-        $('.col-amount', row).classList.toggle('amount-in', !pending);
+        $('.col-amount', row).classList.toggle('amount-in', status === 'Done');
         $('.col-local', row).textContent = t.currency + ' ' + money(t.pay);
-        status.textContent = pending ? 'Pending' : 'Done';
-        status.classList.toggle('pending', pending);
       }
+      setRowStatus(row, status);
+      records[t.reference] = Object.assign({}, t, { status: status });
       $('th', row).insertAdjacentHTML('beforeend', '<span class="badge-new">New</span>');
       body.insertBefore(row, body.firstChild);
 
@@ -1048,7 +1273,8 @@
     const typeLabels = { all: 'All transactions', sent: 'Money sent', received: 'Money received', payment: 'Payments', topup: 'Top-ups' };
 
     function amountOf(row) {
-      if (row.dataset.pending) return 0; // pending top-ups don't change the balance yet
+      // Pending top-ups don't change the balance yet, and cancelled items never do
+      if (row.dataset.pending || row.dataset.cancelled) return 0;
       const text = $('.col-amount', row).textContent.replace('−', '-').replace(/[+,]/g, '');
       return parseFloat(text) || 0;
     }
@@ -1074,16 +1300,141 @@
       $('#activity-table').hidden = count === 0;
     }
 
+    function setType(next) {
+      type = next;
+      chips.forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.filter === next)));
+    }
+
     chips.forEach((chip) => {
       chip.addEventListener('click', () => {
-        type = chip.dataset.filter;
-        chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+        setType(chip.dataset.filter);
         apply();
       });
     });
     month.addEventListener('change', apply);
     $('#filters').addEventListener('submit', (event) => event.preventDefault());
+
+    // ----- Receipts -----
+    const cancelButton = $('#receipt-cancel');
+    const confirmBox = $('#receipt-confirm');
+    const continueLink = $('#receipt-continue');
+    let openRef = null;
+    let opener = null;
+
+    function askCancel(open) {
+      confirmBox.hidden = !open;
+      cancelButton.setAttribute('aria-expanded', String(open));
+      if (open) $('#receipt-confirm-yes').focus();
+    }
+
+    function renderReceipt(ref) {
+      const record = records[ref];
+      const r = receiptFor(record);
+      $('#receipt-kicker').textContent = r.kicker;
+      $('#receipt-title').textContent = r.title;
+      $('#receipt-amount').textContent = r.amountText;
+      const badge = $('#receipt-status');
+      badge.textContent = record.status;
+      badge.classList.toggle('pending', record.status === 'Scheduled' || record.status === 'Pending');
+      badge.classList.toggle('cancelled', record.status === 'Cancelled');
+      const list = $('#receipt-list');
+      list.textContent = '';
+      r.lines.forEach((line) => {
+        const div = document.createElement('div');
+        if (line.total) div.className = 'summary-total';
+        const dt = document.createElement('dt');
+        const dd = document.createElement('dd');
+        dt.textContent = line.label;
+        dd.textContent = line.value;
+        div.appendChild(dt);
+        div.appendChild(dd);
+        list.appendChild(div);
+      });
+      $('#receipt-ref').textContent = ref;
+
+      continueLink.hidden = r.action !== 'pending-topup';
+      continueLink.href = 'top-up.html?ref=' + encodeURIComponent(ref);
+      cancelButton.hidden = !r.action;
+      cancelButton.textContent = r.action === 'pending-topup' ? 'Cancel top-up' : 'Cancel transfer';
+      if (r.action === 'pending-topup') $('#receipt-confirm-text').textContent = 'Cancel this top-up? Don\'t pay it after you cancel.';
+      if (r.action === 'cancel-transfer') $('#receipt-confirm-text').textContent = 'Cancel this transfer? ' + money(record.amount) + ' USDC goes back to your balance.';
+      $('#receipt-confirm-yes').textContent = r.action === 'pending-topup' ? 'Yes, cancel top-up' : 'Yes, cancel transfer';
+      askCancel(false);
+    }
+
+    function openReceipt(ref, from) {
+      if (!records[ref]) return;
+      openRef = ref;
+      opener = from || null;
+      renderReceipt(ref);
+      if (typeof dialog.showModal === 'function') {
+        if (!dialog.open) dialog.showModal();
+      } else {
+        dialog.classList.add('is-fallback'); // older browsers: shown on top, without the dimmed backdrop
+        dialog.setAttribute('open', '');
+      }
+      $('#receipt-title').focus();
+    }
+
+    function closeReceipt() {
+      if (typeof dialog.close === 'function') dialog.close();
+      else dialog.removeAttribute('open');
+    }
+
+    dialog.addEventListener('close', () => {
+      if (opener && document.contains(opener)) opener.focus();
+    });
+    $('#receipt-close').addEventListener('click', closeReceipt);
+    // A click on the dimmed area around the receipt closes it
+    dialog.addEventListener('click', (event) => { if (event.target === dialog) closeReceipt(); });
+
+    cancelButton.addEventListener('click', () => askCancel(confirmBox.hidden));
+    $('#receipt-confirm-no').addEventListener('click', () => { askCancel(false); cancelButton.focus(); });
+    $('#receipt-confirm-yes').addEventListener('click', () => {
+      const record = records[openRef];
+      if (record.sample) {
+        store.set('cancelled', cancelledSamples().concat(openRef));
+      } else {
+        setStatus(record.kind === 'sent' ? 'sent' : 'topups', openRef, 'Cancelled');
+      }
+      record.status = 'Cancelled';
+      setRowStatus($('tr[data-ref="' + openRef + '"]', body), 'Cancelled');
+      apply();
+      renderReceipt(openRef);
+      announce(record.kind === 'sent'
+        ? 'Transfer cancelled. ' + money(record.amount) + ' USDC is back in your balance.'
+        : 'Top-up cancelled.');
+      $('#receipt-close').focus();
+    });
+
+    // Every row opens its receipt: the description becomes a button (keyboard and screen readers),
+    // and a tap anywhere on the row does the same
+    $$('tr', body).forEach((row) => {
+      const ref = row.dataset.ref;
+      if (!records[ref]) return;
+      const th = $('th', row);
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'row-open';
+      button.setAttribute('aria-haspopup', 'dialog');
+      while (th.firstChild) button.appendChild(th.firstChild);
+      th.appendChild(button);
+      button.addEventListener('click', () => openReceipt(ref, button));
+      row.addEventListener('click', (event) => {
+        if (event.target.closest('button, a')) return;
+        openReceipt(ref, button);
+      });
+    });
+
+    // Opened from Home or a confirmation: activity.html?ref=KV-...
+    const wanted = new URLSearchParams(window.location.search).get('ref');
+    const wantedRow = wanted && records[wanted] ? $('tr[data-ref="' + wanted + '"]', body) : null;
+    if (wantedRow) {
+      setType('all');
+      month.value = wantedRow.dataset.month;
+    }
     apply();
+    if (wantedRow) openReceipt(wanted, $('.row-open', wantedRow));
   }
 
   // ---------- Help ----------

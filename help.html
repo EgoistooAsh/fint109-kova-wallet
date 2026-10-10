@@ -60,7 +60,15 @@
             </details>
             <details>
               <summary>What are the fees?</summary>
-              <div><p>A flat transfer fee of 0.50 USDC plus a 0.5% conversion fee when the money changes currency. You always see the total and the exact amount they receive before you confirm.</p></div>
+              <div><p>A flat transfer fee of 0.50 USDC plus a 0.5% conversion fee when the money changes currency. Each fee is rounded to the cent first, so the receipt always adds up. You see the total and the exact amount they receive before you confirm.</p></div>
+            </details>
+            <details id="cancel">
+              <summary>Can I cancel a transfer or top-up?</summary>
+              <div><p>A scheduled transfer can be cancelled until its send date: open it in <a href="activity.html">Activity</a> and choose Cancel transfer. The money goes straight back to your balance. A transfer sent today can't be cancelled.</p><p>A top-up that's waiting for payment can be cancelled from its payment details. Open it from Coming up on Home, or from Activity.</p></div>
+            </details>
+            <details id="receipts">
+              <summary>Where do I find my reference number?</summary>
+              <div><p>Every transaction in <a href="activity.html">Activity</a> opens a receipt with its reference number, fees, exchange rate and delivery method. There's a button to copy the reference for support.</p></div>
             </details>
             <details>
               <summary>What is USDC?</summary>
@@ -105,7 +113,7 @@
             <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg><span>Government ID numbers</span></li>
             <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg><span>Your card's full number or security code in a transfer form</span></li>
           </ul>
-          <p class="callout"><strong>Prototype note:</strong> this demo has no server. Whatever you type stays in your browser for this session only and disappears when you close the tab. The only thing remembered on this device is whether you chose light or dark mode.</p>
+          <p class="callout"><strong>Prototype note:</strong> this demo has no server. Whatever you type stays in your browser for this session only and disappears when you close the tab. Only two things are remembered on this device: whether you chose light or dark mode, and, if you ticked Keep me signed in, that you're signed in. Signing out clears it.</p>
         </section>
 
         <section class="panel span-2 contact-card" id="contact" aria-labelledby="contact-title">

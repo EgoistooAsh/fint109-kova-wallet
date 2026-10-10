@@ -9,6 +9,7 @@
   <meta name="theme-color" content="#0B1F33">
   <link rel="icon" href="images/kova-logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/style.css">
+  <script src="js/guard.js"></script>
   <script src="js/theme.js"></script>
 </head>
 <body data-page="dashboard">
@@ -90,7 +91,7 @@
             <li class="tx">
               <span class="tx-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3 10.5 13.5"/><path d="M21 3l-6.5 18-4-7.5L3 9.5 21 3z"/></svg></span>
               <span class="tx-what"><b>Sent to Mama Rosa</b><small>8 Oct &middot; E-wallet</small></span>
-              <span class="tx-amount">&minus;200.00<small>PHP 11,314.64</small></span>
+              <span class="tx-amount">&minus;200.00<small>PHP 11,314.50</small></span>
             </li>
             <li class="tx">
               <span class="tx-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><path d="M14 14h2v2M20 14v6h-6"/></svg></span>
@@ -107,10 +108,11 @@
 
         <section class="panel dash-upcoming" aria-labelledby="scheduled-title">
           <div class="panel-head"><h2 id="scheduled-title">Coming up</h2></div>
-          <div class="scheduled">
+          <a class="scheduled" href="activity.html?ref=KV-20261023-3307" data-ref="KV-20261023-3307">
             <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>
             <p><b>Mama Rosa, 200.00 USDC</b><br>Scheduled for 23 Oct, to her e-wallet</p>
-          </div>
+          </a>
+          <p class="empty-state" id="upcoming-empty" hidden>Nothing coming up.</p>
         </section>
       </div>
     </main>

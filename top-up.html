@@ -9,6 +9,7 @@
   <meta name="theme-color" content="#0B1F33">
   <link rel="icon" href="images/kova-logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/style.css">
+  <script src="js/guard.js"></script>
   <script src="js/theme.js"></script>
 </head>
 <body data-page="top-up">
@@ -41,6 +42,8 @@
         <h1>Add money</h1>
         <p>Choose how to pay and how much. You'll see exactly what lands in your balance before anything happens. All fields are required unless they say optional.</p>
       </div>
+
+      <p class="callout pending-note" id="pending-topup" hidden><span id="pending-topup-text">You have a top-up waiting for payment.</span> <a id="pending-topup-link" href="top-up.html">Show the payment details</a></p>
 
       <div class="error-summary" id="error-summary" tabindex="-1" role="alert" hidden>
         <h2>There's a problem</h2>
@@ -217,6 +220,14 @@
         </div>
         <p class="sample-note" id="topup-sample-note">Showing a sample bank transfer top-up.</p>
         <p><button class="text-button" type="button" id="simulate-paid" data-js-only hidden>Prototype only: pretend the payment arrived</button></p>
+        <p><button class="text-button text-danger" type="button" id="cancel-topup" aria-controls="cancel-topup-confirm" aria-expanded="false" hidden>Cancel this top-up</button></p>
+        <div class="confirm-box" id="cancel-topup-confirm" hidden>
+          <p id="cancel-topup-question">Cancel this top-up? Don't pay it after you cancel.</p>
+          <div class="confirm-actions">
+            <button class="btn btn-danger" type="button" id="cancel-topup-yes">Yes, cancel top-up</button>
+            <button class="btn btn-secondary" type="button" id="cancel-topup-no">Keep it</button>
+          </div>
+        </div>
         <div class="done-actions">
           <a class="btn btn-primary" href="dashboard.html">Back to Home</a>
           <a class="btn btn-secondary" href="activity.html">View in Activity</a>

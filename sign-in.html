@@ -36,6 +36,7 @@
       <section class="auth-card" aria-labelledby="sign-in-title">
         <h1 id="sign-in-title">Sign in to Kova</h1>
         <p>This is a prototype. Use the demo account below and don't enter your real details. Both fields are required.</p>
+        <p class="callout" id="sign-in-needed" role="status" hidden>Please sign in first. We'll take you back to the page you opened.</p>
 
         <div class="demo-box">
           <h2 id="demo-title" class="visually-hidden">Demo account</h2>
@@ -71,7 +72,7 @@
           <label class="check">
             <input type="checkbox" id="remember">
             <span class="check-box" aria-hidden="true"></span>
-            <span class="check-text">Keep me signed in on this device <span class="optional">(optional)</span><small>Don't tick this on a shared phone.</small></span>
+            <span class="check-text">Keep me signed in on this device <span class="optional">(optional)</span><small>Stays signed in after you close the browser, until you sign out. Don't tick this on a shared phone.</small></span>
           </label>
 
           <button class="btn btn-primary btn-block" type="submit">Sign in</button>

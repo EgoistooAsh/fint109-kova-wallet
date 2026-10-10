@@ -9,6 +9,7 @@
   <meta name="theme-color" content="#0B1F33">
   <link rel="icon" href="images/kova-logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/style.css">
+  <script src="js/guard.js"></script>
   <script src="js/theme.js"></script>
 </head>
 <body data-page="confirm">
@@ -59,7 +60,7 @@
             <div><dt>You send</dt><dd id="s-amount">200.00 USDC</dd></div>
             <div><dt>Fees</dt><dd id="s-fees">1.50 USDC</dd></div>
             <div><dt>Exchange rate</dt><dd id="s-rate">1 USDC = 57.00 PHP</dd></div>
-            <div class="summary-total"><dt>They receive</dt><dd id="s-receive">PHP 11,314.64</dd></div>
+            <div class="summary-total"><dt>They receive</dt><dd id="s-receive">PHP 11,314.50</dd></div>
           </dl>
           <div class="review-actions">
             <a class="btn btn-primary" href="#done" id="confirm-button">Confirm and send</a>
@@ -72,20 +73,30 @@
           <h2 id="before-title">Before you confirm</h2>
           <ul class="never-list tip-list">
             <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Make sure the mobile number is right. Money sent to the wrong number can be hard to get back.</span></li>
-            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>You can edit or cancel until you tap Confirm and send.</span></li>
+            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>You can edit until you tap Confirm. A scheduled transfer can still be cancelled in Activity until its send date.</span></li>
             <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.2a2.5 2.5 0 0 1 4.8 1c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17.2h.01"/></svg><span>Not sure about something? <a href="help.html">Visit Help</a>.</span></li>
           </ul>
         </aside>
       </div>
 
+      <section class="panel empty-panel" id="no-transfer" tabindex="-1" aria-labelledby="no-transfer-title" hidden>
+        <div class="done-icon is-pending"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3 10.5 13.5"/><path d="M21 3l-6.5 18-4-7.5L3 9.5 21 3z"/></svg></div>
+        <h2 id="no-transfer-title">There's no transfer to review</h2>
+        <p>Your last transfer has already been sent, or you haven't started a new one. Nothing was sent from this page.</p>
+        <div class="done-actions">
+          <a class="btn btn-primary" href="send.html">Go to Send money</a>
+          <a class="btn btn-secondary" href="activity.html">View Activity</a>
+        </div>
+      </section>
+
       <section class="panel done-panel" id="done" tabindex="-1" aria-labelledby="done-title">
         <div class="done-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></div>
         <h2 id="done-title">Money sent</h2>
-        <p id="done-message">Mama Rosa Santos will receive PHP 11,314.64 within 5 minutes. We've texted her to let her know.</p>
+        <p id="done-message">Mama Rosa Santos will receive PHP 11,314.50 within 5 minutes. We've texted her to let her know.</p>
         <p class="reference" id="done-reference">KV-20261009-0042</p>
-        <p>Keep this reference number if you need to contact support.</p>
+        <p>You can find this reference and the full receipt in Activity at any time.</p>
         <div class="done-actions">
-          <a class="btn btn-primary" href="activity.html">View in Activity</a>
+          <a class="btn btn-primary" href="activity.html" id="done-activity">View receipt in Activity</a>
           <a class="btn btn-secondary" href="dashboard.html">Back to Home</a>
         </div>
       </section>
